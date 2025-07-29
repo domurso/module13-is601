@@ -14,18 +14,13 @@ def get_current_user(
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
-
     token_data = User.verify_token(token)
     if token_data is None:
         raise credentials_exception
-
     try:
-        # If the token data is a dictionary:
         if isinstance(token_data, dict):
-            # If the payload contains a full set of user fields, use them directly.
-            if "username" in token_data:
+            if "usern" in token_data:
                 return UserResponse(**token_data)
-            # Otherwise, assume it is a minimal payload with only the 'sub' key.
             elif "sub" in token_data:
                 return UserResponse(
                     id=token_data["sub"],
@@ -58,7 +53,6 @@ def get_current_user(
 
     except Exception:
         raise credentials_exception
-
 def get_current_active_user(
     current_user: UserResponse = Depends(get_current_user)) -> UserResponse:
     if not current_user.is_active:

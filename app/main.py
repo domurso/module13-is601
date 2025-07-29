@@ -2,8 +2,9 @@ from contextlib import asynccontextmanager
 from datetime import datetime, timezone, timedelta
 from uuid import UUID
 from typing import List
-from fastapi import Body, FastAPI, Depends, HTTPException, status
+from fastapi import Body, FastAPI, Depends, HTTPException, status, Request
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 
 from app.auth.dependencies import get_current_active_user
@@ -29,12 +30,26 @@ app = FastAPI(
     lifespan=lifespan
 )
 
+# Configure Jinja2 templates
+templates = Jinja2Templates(directory="templates")
+
 # ------------------------------------------------------------------------------
 # Health Endpoint
 # ------------------------------------------------------------------------------
 @app.get("/health", tags=["health"])
 def read_health():
     return {"status": "ok"}
+
+# ------------------------------------------------------------------------------
+# HTML Rendering Endpoints
+# ------------------------------------------------------------------------------
+@app.get("/register", tags=["auth"])
+async def get_register(request: Request):
+    return templates.TemplateResponse("register.html", {"request": request})
+
+@app.get("/login", tags=["auth"])
+async def get_login(request: Request):
+    return templates.TemplateResponse("login.html", {"request": request})
 
 # ------------------------------------------------------------------------------
 # User Registration Endpoint
@@ -236,3 +251,4 @@ def delete_calculation(
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("app.main:app", host="127.0.0.1", port=8001, log_level="info")
+

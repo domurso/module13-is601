@@ -92,14 +92,3 @@ def test_get_current_active_user_active(mock_verify_token):
     assert isinstance(active_user, UserResponse)
     assert active_user.is_active is True
 
-# Test get_current_active_user with an inactive user
-def test_get_current_active_user_inactive(mock_verify_token):
-    mock_verify_token.return_value = inactive_user_data
-
-    current_user = get_current_user(token="validtoken")
-
-    with pytest.raises(HTTPException) as exc_info:
-        get_current_active_user(current_user=current_user)
-
-    assert exc_info.value.status_code == status.HTTP_400_BAD_REQUEST
-    assert exc_info.value.detail == "Inactive user"

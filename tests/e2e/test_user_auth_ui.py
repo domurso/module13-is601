@@ -3,7 +3,7 @@ from playwright.sync_api import sync_playwright, expect
 import time
 
 # Base URL of the application
-BASE_URL = "http://127.0.0.1:8001"
+BASE_URL = "http://127.0.0.1:8000"
 
 # Helper function to generate unique username
 def generate_unique_username():

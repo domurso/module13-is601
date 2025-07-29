@@ -59,8 +59,8 @@ def test_register_with_valid_data(page):
     page.fill("#email", f"{username}@example.com")
     page.fill("#first_name", "Test")
     page.fill("#last_name", "User")
-    page.fill("#password", "ValidPassword123")
-    page.fill("#confirm_password", "ValidPassword123")
+    page.fill("#password", "ValidPassword123!")
+    page.fill("#confirm_password", "ValidPassword123!")
 
     # Debug: Capture form state
     page.screenshot(path="screenshots/register_form_filled.png")
@@ -91,8 +91,8 @@ def test_login_with_correct_credentials(page):
     page.fill("#email", f"{username}@example.com")
     page.fill("#first_name", "Test")
     page.fill("#last_name", "User")
-    page.fill("#password", "ValidPassword123")
-    page.fill("#confirm_password", "ValidPassword123")
+    page.fill("#password", "ValidPassword123!")
+    page.fill("#confirm_password", "ValidPassword123!")
     page.click("button[type='submit']")
     page.wait_for_url(f"{BASE_URL}/login", timeout=30000)
 
@@ -102,7 +102,7 @@ def test_login_with_correct_credentials(page):
     # Now login
     page.goto(f"{BASE_URL}/login")
     page.fill("#username", username)
-    page.fill("#password", "ValidPassword123")
+    page.fill("#password", "ValidPassword123!")
     
     # Intercept login response
     with page.expect_response("**/auth/login") as response_info:
@@ -150,8 +150,8 @@ def test_login_with_wrong_password(page):
     page.fill("#email", f"{username}@example.com")
     page.fill("#first_name", "Test")
     page.fill("#last_name", "User")
-    page.fill("#password", "ValidPassword123")
-    page.fill("#confirm_password", "ValidPassword123")
+    page.fill("#password", "ValidPassword123!")
+    page.fill("#confirm_password", "ValidPassword123!")
     page.click("button[type='submit']")
     page.wait_for_url(f"{BASE_URL}/login", timeout=30000)
 

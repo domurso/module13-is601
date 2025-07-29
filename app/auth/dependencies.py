@@ -19,7 +19,7 @@ def get_current_user(
         raise credentials_exception
     try:
         if isinstance(token_data, dict):
-            if "usern" in token_data:
+            if "username" in token_data:
                 return UserResponse(**token_data)
             elif "sub" in token_data:
                 return UserResponse(

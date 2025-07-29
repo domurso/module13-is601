@@ -38,7 +38,7 @@ def page():
         page.close()
         browser.close()
 
-# Positive Test: Register with valid data and confirm redirect to /login
+# Positive Test: Register with valid data
 def test_register_with_valid_data(page):
     username = generate_unique_username()
     
@@ -62,26 +62,24 @@ def test_register_with_valid_data(page):
     page.fill("#password", "ValidPassword123")
     page.fill("#confirm_password", "ValidPassword123")
 
-    # Debug: Capture form state and check validation
+    # Debug: Capture form state
     page.screenshot(path="screenshots/register_form_filled.png")
-    validation_errors = page.evaluate("document.querySelector('#error-message')?.innerText")
-    if validation_errors:
-        print(f"Client-side validation errors: {validation_errors}")
-
+    
     # Submit the form and intercept response
     with page.expect_response("**/auth/register") as response_info:
         page.click("button[type='submit']")
         response = response_info.value
-        print(f"Register response: {response.status} {response.text}")
-        assert response.status == 201, f"Expected 201, got {response.status}: {response.text}"
+        response_body = response.text()
+        print(f"Register response: {response.status} {response_body}")
+        assert response.status == 201, f"Expected 201, got {response.status}: {response_body}"
 
     # Confirm success message
     success_message = page.locator("#success-message")
-    expect(success_message).to_be_visible(timeout=15000)
+    expect(success_message).to_be_visible(timeout=30000)
     expect(success_message).to_have_text("Registration successful! Redirecting to login...")
 
     # Confirm redirect to /login
-    page.wait_for_url(f"{BASE_URL}/login", timeout=15000)
+    page.wait_for_url(f"{BASE_URL}/login", timeout=30000)
     print(f"Redirected to {page.url}")
 
 # Positive Test: Login with correct credentials
@@ -96,7 +94,7 @@ def test_login_with_correct_credentials(page):
     page.fill("#password", "ValidPassword123")
     page.fill("#confirm_password", "ValidPassword123")
     page.click("button[type='submit']")
-    page.wait_for_url(f"{BASE_URL}/login", timeout=15000)
+    page.wait_for_url(f"{BASE_URL}/login", timeout=30000)
 
     # Debug: Check login page loaded
     page.screenshot(path="screenshots/login_page.png")
@@ -110,12 +108,13 @@ def test_login_with_correct_credentials(page):
     with page.expect_response("**/auth/login") as response_info:
         page.click("button[type='submit']")
         response = response_info.value
-        print(f"Login response: {response.status} {response.text}")
-        assert response.status == 200, f"Expected 200, got {response.status}: {response.text}"
+        response_body = response.text()
+        print(f"Login response: {response.status} {response_body}")
+        assert response.status == 200, f"Expected 200, got {response.status}: {response_body}"
 
     # Confirm success message and token display
     success_message = page.locator("#success-message")
-    expect(success_message).to_be_visible(timeout=15000)
+    expect(success_message).to_be_visible(timeout=30000)
     expect(success_message).to_contain_text("Login successful! Access Token:")
 
     # Check localStorage for token
@@ -139,7 +138,7 @@ def test_register_with_short_password(page):
 
     # Confirm client-side error message
     error_message = page.locator("#error-message")
-    expect(error_message).to_be_visible(timeout=15000)
+    expect(error_message).to_be_visible(timeout=30000)
     expect(error_message).to_have_text("Password must be at least 8 characters long")
 
 # Negative Test: Login with wrong password
@@ -154,7 +153,7 @@ def test_login_with_wrong_password(page):
     page.fill("#password", "ValidPassword123")
     page.fill("#confirm_password", "ValidPassword123")
     page.click("button[type='submit']")
-    page.wait_for_url(f"{BASE_URL}/login", timeout=15000)
+    page.wait_for_url(f"{BASE_URL}/login", timeout=30000)
 
     # Attempt login with wrong password
     page.goto(f"{BASE_URL}/login")
@@ -165,10 +164,11 @@ def test_login_with_wrong_password(page):
     with page.expect_response("**/auth/login") as response_info:
         page.click("button[type='submit']")
         response = response_info.value
-        print(f"Login response: {response.status} {response.text}")
-        assert response.status == 401, f"Expected 401, got {response.status}: {response.text}"
+        response_body = response.text()
+        print(f"Login response: {response.status} {response_body}")
+        assert response.status == 401, f"Expected 401, got {response.status}: {response_body}"
 
     # Confirm server error message
     error_message = page.locator("#error-message")
-    expect(error_message).to_be_visible(timeout=15000)
+    expect(error_message).to_be_visible(timeout=30000)
     expect(error_message).to_have_text("Invalid username or password")

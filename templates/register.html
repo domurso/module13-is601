@@ -60,13 +60,44 @@
             successMessage.classList.add('hidden');
 
             const formData = new FormData(e.target);
+            const username = formData.get('username');
+            const email = formData.get('email');
+            const first_name = formData.get('first_name');
+            const last_name = formData.get('last_name');
+            const password = formData.get('password');
+            const confirm_password = formData.get('confirm_password');
+
+            // Client-side validation
+            const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!usernameRegex.test(username)) {
+                errorMessage.textContent = 'Username must be 3-20 characters (letters, numbers, underscores)';
+                errorMessage.classList.remove('hidden');
+                return;
+            }
+            if (!emailRegex.test(email)) {
+                errorMessage.textContent = 'Invalid email format';
+                errorMessage.classList.remove('hidden');
+                return;
+            }
+            if (password.length < 8) {
+                errorMessage.textContent = 'Password must be at least 8 characters long';
+                errorMessage.classList.remove('hidden');
+                return;
+            }
+            if (password !== confirm_password) {
+                errorMessage.textContent = 'Passwords do not match';
+                errorMessage.classList.remove('hidden');
+                return;
+            }
+
             const data = {
-                username: formData.get('username'),
-                email: formData.get('email'),
-                first_name: formData.get('first_name'),
-                last_name: formData.get('last_name'),
-                password: formData.get('password'),
-                confirm_password: formData.get('confirm_password')
+                username,
+                email,
+                first_name,
+                last_name,
+                password,
+                confirm_password
             };
 
             try {
@@ -76,7 +107,7 @@
                     body: JSON.stringify(data)
                 });
 
-                if (response.ok) {
+                if (response.status === 201) {
                     successMessage.textContent = 'Registration successful! Redirecting to login...';
                     successMessage.classList.remove('hidden');
                     setTimeout(() => window.location.href = '/login', 2000);

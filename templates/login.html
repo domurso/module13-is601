@@ -63,7 +63,11 @@
                     const result = await response.json();
                     localStorage.setItem('access_token', result.access_token);
                     localStorage.setItem('refresh_token', result.refresh_token);
-                    successMessage.textContent = 'Login successful! Token stored.';
+                    // Truncate token for display (first 20 chars + "...")
+                    const shortToken = result.access_token.length > 20 
+                        ? result.access_token.substring(0, 20) + '...' 
+                        : result.access_token;
+                    successMessage.textContent = `Login successful! Access Token: ${shortToken}`;
                     successMessage.classList.remove('hidden');
                     // Optional: Redirect to dashboard
                     // setTimeout(() => window.location.href = '/dashboard', 2000);

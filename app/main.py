@@ -129,7 +129,6 @@ def login_form(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = D
 # ------------------------------------------------------------------------------
 # Calculations Endpoints (BREAD)
 # ------------------------------------------------------------------------------
-# Create (Add) Calculation – using CalculationBase so that 'user_id' from the client is ignored.
 @app.post(
     "/calculations",
     response_model=CalculationResponse,
@@ -141,27 +140,17 @@ def create_calculation(
     current_user = Depends(get_current_active_user),
     db: Session = Depends(get_db)
 ):
-    """
-    Compute and persist a calculation.
-    
-    The endpoint reads the calculation type and inputs from the request (ignoring any extra fields),
-    computes the result using the appropriate operation, and assigns the authenticated user's ID.
-    """
     try:
-        # Create the calculation using the factory method.
         new_calculation = Calculation.create(
             calculation_type=calculation_data.type,
             user_id=current_user.id,
             inputs=calculation_data.inputs,
         )
         new_calculation.result = new_calculation.get_result()
-
-        # Persist the calculation to the database.
         db.add(new_calculation)
         db.commit()
         db.refresh(new_calculation)
         return new_calculation
-
     except ValueError as e:
         db.rollback()
         raise HTTPException(
@@ -169,7 +158,6 @@ def create_calculation(
             detail=str(e)
         )
 
-# Browse / List Calculations (for the current user)
 @app.get("/calculations", response_model=List[CalculationResponse], tags=["calculations"])
 def list_calculations(
     current_user = Depends(get_current_active_user),
@@ -178,7 +166,6 @@ def list_calculations(
     calculations = db.query(Calculation).filter(Calculation.user_id == current_user.id).all()
     return calculations
 
-# Read / Retrieve a Specific Calculation by ID
 @app.get("/calculations/{calc_id}", response_model=CalculationResponse, tags=["calculations"])
 def get_calculation(
     calc_id: str,
@@ -197,7 +184,6 @@ def get_calculation(
         raise HTTPException(status_code=404, detail="Calculation not found.")
     return calculation
 
-# Edit / Update a Calculation
 @app.put("/calculations/{calc_id}", response_model=CalculationResponse, tags=["calculations"])
 def update_calculation(
     calc_id: str,
@@ -224,7 +210,6 @@ def update_calculation(
     db.refresh(calculation)
     return calculation
 
-# Delete a Calculation
 @app.delete("/calculations/{calc_id}", status_code=status.HTTP_204_NO_CONTENT, tags=["calculations"])
 def delete_calculation(
     calc_id: str,
@@ -251,4 +236,3 @@ def delete_calculation(
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("app.main:app", host="127.0.0.1", port=8001, log_level="info")
-
